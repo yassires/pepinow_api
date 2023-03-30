@@ -19,6 +19,7 @@ class PlantesController extends Controller
     public function index()
     {
         //
+        // $this->authorize('view', plantes::class);
         $plantes = plantes::all();
 
         return response()->json([
@@ -45,19 +46,29 @@ class PlantesController extends Controller
      */
     public function store(StoreplantesRequest $request)
     {
-        //
-        DB::table('plantes')->insert([
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price,
-            'category_id' => $request->category_id,
-            'user_id' => Auth::user()->id,
-            'created_at' => Carbon::now(),
-        ]);
 
-        return response()->json([
-            'message' => 'Successfully'
-        ], 200);
+        $authUser = auth()->user();
+        $role = $authUser->getRoleNames()[0];
+        // return $role;
+
+        // $this->authorize('create', category::class);
+        if ($role == 'seller' || $role = 'admin') {
+            DB::table('plantes')->insert([
+                'name' => $request->name,
+                'description' => $request->description,
+                'price' => $request->price,
+                'category_id' => $request->category_id,
+                'user_id' => Auth::user()->id,
+                'created_at' => Carbon::now(),
+            ]);
+            return response()->json([
+                'message' => 'Successfully'
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'error in the condition'
+            ], 200);
+        }
     }
 
     /**
@@ -101,29 +112,34 @@ class PlantesController extends Controller
      * @param  \App\Models\plantes  $plantes
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateplantesRequest $request, $id)
+    public function update(UpdateplantesRequest $request, $plantes)
     {
-        //
-        $is_find = plantes::find($id);
+        $plante = plantes::find($plantes);
+        // $user = Auth::user();
+        // $this->authorize('update',  [$user, $plante]);
+        $authUser = auth()->user();
+        $role = $authUser->getRoleNames()[0];
+        // if ($user->hasDirectPermission('edit-plante')  && $user->id == $plante->user_id)
+        if ($role == 'seller' || $role = 'admin') {
+            if (null != $plante) {
+                $plante->name = $request->name;
+                $plante->user_id = Auth::user()->id;
+                $plante->description = $request->description;
+                $plante->price = $request->price;
+                $plante->category_id = $request->category_id;
+                $plante->created_at = Carbon::now();
+                $plante->update();
 
-        if ($is_find) {
-            $is_find->name = $request->name;
-            $is_find->user_id = Auth::user()->id;
-            $is_find->description = $request->description;
-            $is_find->price = $request->price;
-            $is_find->category_id = $request->category_id;
-            $is_find->created_at = Carbon::now();
-            $is_find->update();
 
+                return response()->json([
+                    'message' => 'Plante Updated Successfull'
+                ]);
+            } else {
 
-            return response()->json([
-                'message' => 'Plante Updated Successfull'
-            ]);
-        } else {
-
-            return response()->json([
-                'message' => 'No Records Found'
-            ], 404);
+                return response()->json([
+                    'message' => 'No Records Found'
+                ], 404);
+            }
         }
     }
 
@@ -136,16 +152,23 @@ class PlantesController extends Controller
     public function destroy($id)
     {
         //
-        $is_deleted = DB::table('plantes')->where('id', $id)->delete();
+        $authUser = auth()->user();
+        $role = $authUser->getRoleNames()[0];
+        // $this->authorize('delete', plantes::class);
+        // return ($id);
+        if ($role == 'seller' || $role = 'admin') {
 
-        if ($is_deleted) {
-            return response()->json([
-                'message' => 'Plante deleted successfully'
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'No Plante Found'
-            ], 404);
+            $is_deleted = DB::table('plantes')->where('id', $id)->delete();
+
+            if ($is_deleted) {
+                return response()->json([
+                    'message' => 'Plante deleted successfully'
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'No Plante Found'
+                ], 404);
+            }
         }
     }
 }

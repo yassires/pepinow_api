@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\PlantesController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\EditRP;
+use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,20 +41,19 @@ Route::controller(AuthController::class)->group(function () {
     Route::put('editProfile', 'editProfile');
 });
 
-Route::apiResource('/plante', PlantesController::class)->middleware(['auth', 'admin']);
-Route::apiResource('/plante', PlantesController::class)->only(['index', 'show'])->middleware(['auth', 'user']);
 
-Route::apiResource('/category', CategoryController::class)->middleware(['auth', 'admin']);
-Route::apiResource('/category', CategoryController::class)->middleware(['auth', 'user'])->only(['index', 'show']);
+Route::apiResource('/plante', PlantesController::class)->middleware(['auth']);
+// Route::apiResource('/plante', PlantesController::class)->only(['index', 'show'])->middleware(['auth', 'user']);
+Route::apiResource('/category', CategoryController::class)->middleware(['auth']);
 
 //Forgot-Reset password 
-Route::group(['controller' => ResetPasswordController::class], function (){
+Route::group(['controller' => ResetPasswordController::class], function () {
     // Request password reset link
     Route::post('forgot-password', 'sendResetLinkEmail')->middleware('guest')->name('password.email');
     // Reset password
     Route::post('reset-password', 'resetPassword')->middleware('guest')->name('password.update');
 
     Route::get('reset-password/{token}', function (string $token) {
-         return $token;
-     })->middleware('guest')->name('password.reset');
+        return $token;
+    })->middleware('guest')->name('password.reset');
 });

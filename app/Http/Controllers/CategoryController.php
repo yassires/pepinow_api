@@ -19,13 +19,13 @@ class CategoryController extends Controller
     public function index()
     {
         //
-         //
-         $category = category::all();
+        //
+        $category = category::all();
 
-         return response()->json([
-             'status' => 'success',
-             'category' => $category
-         ]);
+        return response()->json([
+            'status' => 'success',
+            'category' => $category
+        ]);
     }
 
     /**
@@ -47,6 +47,7 @@ class CategoryController extends Controller
     public function store(StorecategoryRequest $request)
     {
         //
+        $this->authorize('create', category::class);
         DB::table('categories')->insert([
             'name' => $request->name,
             'user_id' => Auth::user()->id,
@@ -99,27 +100,32 @@ class CategoryController extends Controller
      * @param  \App\Models\category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdatecategoryRequest $request,$id)
+    public function update(UpdatecategoryRequest $request, $category)
     {
         //
-        $is_find = category::find($id);
+        $categories = category::find($category);
+        $user = Auth::user();
+        $this->authorize('update', [$user, $categories]);
+        // if ($user->hasDirectPermission('edit-plante')  && $user->id == $categories->user_id)
+            if (null != $categories) {
+                $categories->name = $request->name;
+                $categories->user_id = Auth::user()->id;
+                $categories->description = $request->description;
+                $categories->price = $request->price;
+                $categories->category_id = $request->category_id;
+                $categories->created_at = Carbon::now();
+                $categories->update();
 
-        if ($is_find) {
-            $is_find->name = $request->name;
-            $is_find->user_id = Auth::user()->id;
-            $is_find->created_at = Carbon::now();
-            $is_find->update();
 
+                return response()->json([
+                    'message' => 'Plante Updated Successfull'
+                ]);
+            } else {
 
-            return response()->json([
-                'message' => 'Category Updated Successfull'
-            ]);
-        } else {
-
-            return response()->json([
-                'message' => 'No Records Found'
-            ], 404);
-        }
+                return response()->json([
+                    'message' => 'No Records Found'
+                ], 404);
+            }
     }
 
     /**
@@ -131,6 +137,7 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         //
+        $this->authorize('delete', category::class);
         $is_deleted = DB::table('categories')->where('id', $id)->delete();
 
         if ($is_deleted) {

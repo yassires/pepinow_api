@@ -2,13 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use App\Enum\UserRoleEnum;
 use Closure;
 use Illuminate\Http\Request;
+use App\Enum\UserRoleEnum;
 use Illuminate\Support\Facades\Auth;
 
-
-class checkAdmin
+class CheckAdminSeller
 {
     /**
      * Handle an incoming request.
@@ -19,13 +18,13 @@ class checkAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        // if (Auth::user()->role == UserRoleEnum::Admin) {
+        if (Auth::user()->role == UserRoleEnum::Admin || Auth::user()->role == UserRoleEnum::Seller) {
             return $next($request);
-        // } else {
-        //     return response()->json([
-        //         'status' => 'error',
-        //         'message' => 'you are not Admin',
-        //     ], 401);
-        // }
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'you are not Admin',
+            ], 401);
+        }
     }
 }

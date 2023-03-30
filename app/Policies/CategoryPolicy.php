@@ -3,12 +3,11 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\plantes;
+use App\Models\category;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 
-
-class PlantesPolicy
+class CategoryPolicy
 {
     use HandlesAuthorization;
 
@@ -20,19 +19,19 @@ class PlantesPolicy
      */
     public function viewAny(User $user)
     {
+        //
     }
 
     /**
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\plantes  $plantes
+     * @param  \App\Models\category  $category
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, plantes $plantes)
+    public function view(User $user, category $category)
     {
         //
-        // return $user->hasPermissionTo('view-plante');
     }
 
     /**
@@ -44,21 +43,20 @@ class PlantesPolicy
     public function create(User $user)
     {
         //
-        // return true;
-        return $user->hasPermissionTo('add-plante');
+        return $user->hasPermissionTo('add-Category');
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\plantes  $plantes
+     * @param  \App\Models\category  $category
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, plantes $plantes)
+    public function update(User $user, category $category)
     {
         //
-        return $user->hasPermissionTo('edit-plante')  && ($user->id == $plantes->user_id) ? Response::allow()
+        return $user->hasPermissionTo('edit-Category')  && $user->id == $category->user_id ? Response::allow()
             : Response::deny('Your are not authorized.');
     }
 
@@ -66,13 +64,13 @@ class PlantesPolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\plantes  $plantes
+     * @param  \App\Models\category  $category
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, plantes $plantes)
+    public function delete(User $user, category $category)
     {
         //
-        return $user->hasPermissionTo('delete-plante')  && $user->id == $plantes->user_id ? Response::allow()
+        return $user->hasPermissionTo('delete-Category')  && $user->id == $category->user_id ? Response::allow()
             : Response::deny('Your are not authorized.');
     }
 
@@ -80,10 +78,10 @@ class PlantesPolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\plantes  $plantes
+     * @param  \App\Models\category  $category
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, plantes $plantes)
+    public function restore(User $user, category $category)
     {
         //
     }
@@ -92,10 +90,10 @@ class PlantesPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\plantes  $plantes
+     * @param  \App\Models\category  $category
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, plantes $plantes)
+    public function forceDelete(User $user, category $category)
     {
         //
     }

@@ -56,6 +56,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+        $user->assignRole('customer');
 
         $token = Auth::login($user);
         return response()->json([
@@ -90,20 +91,22 @@ class AuthController extends Controller
         ]);
     }
 
-    public function profile(){
-        $user = DB::table('users')->select('name','email')->find(Auth::user()->id);
+    public function profile()
+    {
+        $user = DB::table('users')->select('name', 'email')->find(Auth::user()->id);
         return response()->json([
             'status' => 'success',
-            'user' =>$user
+            'user' => $user
         ]);
     }
 
-    public function EditProfile(ProfileRequest $request,User $user){
+    public function EditProfile(ProfileRequest $request, User $user)
+    {
         $passwirdUser = Auth::user()->password;
         // $v = $request->validated();
         // dd($passwirdUser);
-        if(Hash::check($request->old_password,$passwirdUser)){
-            $user = DB::table('users')->where('id',Auth::user()->id)->update([
+        if (Hash::check($request->old_password, $passwirdUser)) {
+            $user = DB::table('users')->where('id', Auth::user()->id)->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password)
@@ -114,16 +117,12 @@ class AuthController extends Controller
                 'status' => 'success',
                 'message' => 'User updated successfully'
             ]);
-
-        }
-        else{
+        } else {
 
             return response()->json([
                 'status' => 'error',
                 'message' => 'error password',
             ], 401);
-
         }
-        
     }
 }

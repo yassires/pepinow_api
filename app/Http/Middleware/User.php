@@ -23,7 +23,7 @@ class User
         } else {
             return response()->json([
                 'status' => 'error',
-                'message' => 'you are not a user',
+                'message' => 'error',
             ], 401);
         }
     }
